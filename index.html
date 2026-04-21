@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Uncle Joe's Coffee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --brown-dark: #2C1A0E;
+      --brown-mid: #5C3317;
+      --brown-warm: #8B4513;
+      --cream: #FDF6EC;
+      --cream-dark: #F0E0C0;
+      --gold: #C8962E;
+      --gold-light: #E8B84B;
+      --text-dark: #1A0F00;
+      --text-mid: #4A3020;
+      --text-light: #8B6B4A;
+      --white: #FFFFFF;
+      --shadow: 0 4px 24px rgba(44, 26, 14, 0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background-color: var(--cream); color: var(--text-dark); min-height: 100vh; }
+    nav { background: var(--brown-dark); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+    .nav-brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; color: var(--gold-light); letter-spacing: 0.02em; }
+    .nav-brand span { color: var(--white); }
+    .nav-links { display: flex; gap: 0.5rem; }
+    .nav-btn { background: none; border: 2px solid transparent; color: var(--cream-dark); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; padding: 0.5rem 1.2rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    .nav-btn:hover, .nav-btn.active { background: var(--gold); border-color: var(--gold); color: var(--white); }
+    .hero { background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, var(--brown-warm) 100%); padding: 5rem 2rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(200,150,46,0.15) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(200,150,46,0.1) 0%, transparent 60%); }
+    .hero-content { position: relative; z-index: 1; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; color: var(--white); line-height: 1.1; margin-bottom: 1rem; }
+    .hero h1 em { font-style: italic; color: var(--gold-light); }
+    .hero p { font-size: 1.15rem; color: var(--cream-dark); max-width: 500px; margin: 0 auto 2rem; font-weight: 300; line-height: 1.6; }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: var(--gold); color: var(--white); border: none; padding: 0.85rem 2rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .btn-secondary { background: transparent; color: var(--cream); border: 2px solid var(--cream-dark); padding: 0.85rem 2rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-secondary:hover { border-color: var(--gold-light); color: var(--gold-light); }
+    .page { display: none; padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .page.active { display: block; }
+    .section-header { margin-bottom: 2.5rem; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .section-header h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: var(--brown-dark); }
+    .section-header h2 span { color: var(--gold); }
+    .filters { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .filter-input { padding: 0.6rem 1rem; border: 2px solid var(--cream-dark); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: var(--white); color: var(--text-dark); transition: border-color 0.2s; min-width: 160px; }
+    .filter-input:focus { outline: none; border-color: var(--gold); }
+    .filter-btn { padding: 0.6rem 1.2rem; background: var(--brown-dark); color: var(--white); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+    .filter-btn:hover { background: var(--brown-warm); }
+    .clear-btn { padding: 0.6rem 1rem; background: transparent; color: var(--text-light); border: 2px solid var(--cream-dark); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+    .clear-btn:hover { border-color: var(--brown-warm); color: var(--brown-warm); }
+    .loading { text-align: center; padding: 4rem 2rem; color: var(--text-light); font-size: 1.1rem; }
+    .loading::before { content: '☕'; display: block; font-size: 3rem; margin-bottom: 1rem; animation: spin 2s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .error-msg { background: #FFF0F0; border: 2px solid #FFCDD2; border-radius: 10px; padding: 1.5rem; text-align: center; color: #C62828; }
+    .category-section { margin-bottom: 3rem; }
+    .category-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--brown-mid); margin-bottom: 1.2rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--cream-dark); display: flex; align-items: center; gap: 0.5rem; }
+    .category-title::before { content: ''; display: inline-block; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem; }
+    .menu-card { background: var(--white); border-radius: 12px; padding: 1.4rem; box-shadow: 0 2px 12px rgba(44,26,14,0.08); border: 1px solid var(--cream-dark); transition: transform 0.2s, box-shadow 0.2s; }
+    .menu-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .menu-card-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--brown-dark); margin-bottom: 0.5rem; line-height: 1.3; }
+    .menu-card-size { font-size: 0.8rem; font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.8rem; }
+    .menu-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--cream-dark); }
+    .menu-card-price { font-size: 1.2rem; font-weight: 700; color: var(--gold); font-family: 'Playfair Display', serif; }
+    .menu-card-cal { font-size: 0.8rem; color: var(--text-light); background: var(--cream); padding: 0.2rem 0.6rem; border-radius: 20px; }
+    .locations-stats { background: var(--brown-dark); color: var(--cream); padding: 1rem 1.5rem; border-radius: 10px; font-size: 0.95rem; margin-bottom: 2rem; }
+    .locations-stats span { color: var(--gold-light); font-weight: 700; }
+    .locations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.2rem; }
+    .location-card { background: var(--white); border-radius: 12px; padding: 1.4rem; box-shadow: 0 2px 12px rgba(44,26,14,0.08); border: 1px solid var(--cream-dark); transition: transform 0.2s, box-shadow 0.2s; }
+    .location-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .location-card.closed { opacity: 0.6; }
+    .location-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem; }
+    .location-city { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--brown-dark); }
+    .location-state { font-size: 0.8rem; background: var(--cream-dark); color: var(--brown-mid); padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; letter-spacing: 0.05em; }
+    .location-address { font-size: 0.9rem; color: var(--text-mid); margin-bottom: 0.8rem; line-height: 1.4; }
+    .location-phone { font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.8rem; }
+    .location-hours { font-size: 0.82rem; color: var(--text-mid); background: var(--cream); padding: 0.6rem 0.8rem; border-radius: 8px; margin-bottom: 0.8rem; line-height: 1.6; }
+    .amenities { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .amenity-tag { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 500; }
+    .amenity-tag.wifi { background: #E3F2FD; color: #1565C0; }
+    .amenity-tag.drive { background: #E8F5E9; color: #2E7D32; }
+    .amenity-tag.doordash { background: #FFF3E0; color: #E65100; }
+    .status-badge { font-size: 0.75rem; padding: 0.2rem 0.7rem; border-radius: 20px; font-weight: 600; }
+    .status-badge.open { background: #E8F5E9; color: #2E7D32; }
+    .status-badge.closed { background: #FFEBEE; color: #C62828; }
+    .result-count { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; }
+    footer { background: var(--brown-dark); color: var(--cream-dark); text-align: center; padding: 2rem; font-size: 0.85rem; margin-top: 4rem; }
+    footer strong { color: var(--gold-light); }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">Uncle <span>Joe's</span></div>
+  <div class="nav-links">
+    <button class="nav-btn" onclick="showPage('home')">Home</button>
+    <button class="nav-btn" onclick="showPage('menu')">Menu</button>
+    <button class="nav-btn" onclick="showPage('locations')">Locations</button>
+  </div>
+</nav>
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-content">
+      <h1>Great Coffee,<br><em>Every Morning.</em></h1>
+      <p>Nearly 500 locations across the upper Midwest. Simple menu, fast service, and a rewards program that keeps you coming back.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('menu')">View Our Menu</button>
+        <button class="btn-secondary" onclick="showPage('locations')">Find a Location</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="page-menu" class="page">
+  <div class="section-header">
+    <h2>Our <span>Menu</span></h2>
+    <div class="filters">
+      <select class="filter-input" id="menu-category-filter"><option value="">All Categories</option></select>
+      <select class="filter-input" id="menu-size-filter">
+        <option value="">All Sizes</option>
+        <option value="Small">Small</option>
+        <option value="Medium">Medium</option>
+        <option value="Large">Large</option>
+      </select>
+      <button class="clear-btn" onclick="clearMenuFilters()">Clear</button>
+    </div>
+  </div>
+  <div id="menu-result-count" class="result-count"></div>
+  <div id="menu-content"><div class="loading">Loading menu...</div></div>
+</div>
+<div id="page-locations" class="page">
+  <div class="section-header">
+    <h2>Find a <span>Location</span></h2>
+    <div class="filters">
+      <input class="filter-input" type="text" id="location-state-filter" placeholder="State (e.g. MN)" maxlength="2"/>
+      <input class="filter-input" type="text" id="location-city-filter" placeholder="City name"/>
+      <button class="filter-btn" onclick="applyLocationFilters()">Search</button>
+      <button class="clear-btn" onclick="clearLocationFilters()">Clear</button>
+    </div>
+  </div>
+  <div id="locations-stats-bar" class="locations-stats" style="display:none"></div>
+  <div id="locations-result-count" class="result-count"></div>
+  <div id="locations-content"><div class="loading">Loading locations...</div></div>
+</div>
+<footer><strong>Uncle Joe's Coffee Company</strong> &mdash; Serving the Upper Midwest</footer>
+<script>
+  const API_BASE = "https://uncle-joes-api-335525972928.us-central1.run.app";
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const heroEl = document.querySelector('.hero');
+    if (name === 'home') { heroEl && (heroEl.style.display = ''); document.getElementById('page-home').classList.add('active'); }
+    else { heroEl && (heroEl.style.display = 'none'); document.getElementById('page-'+name).classList.add('active'); }
+    document.querySelectorAll('.nav-btn').forEach(b => { if (b.textContent.toLowerCase().includes(name)) b.classList.add('active'); });
+    if (name === 'menu' && !menuLoaded) loadMenu();
+    if (name === 'locations' && !locationsLoaded) loadLocations();
+  }
+  let allMenuItems = [], menuLoaded = false;
+  async function loadMenu() {
+    menuLoaded = true;
+    try {
+      const res = await fetch(API_BASE+'/menu?limit=500');
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      allMenuItems = await res.json();
+      populateCategoryFilter();
+      renderMenu(allMenuItems);
+    } catch(err) {
+      document.getElementById('menu-content').innerHTML = '<div class="error-msg">Failed to load menu.<br><small>'+err.message+'</small></div>';
+    }
+  }
+  function populateCategoryFilter() {
+    const cats = [...new Set(allMenuItems.map(i => i.category))].sort();
+    const sel = document.getElementById('menu-category-filter');
+    cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; sel.appendChild(opt); });
+    sel.addEventListener('change', filterMenu);
+    document.getElementById('menu-size-filter').addEventListener('change', filterMenu);
+  }
+  function filterMenu() {
+    const cat = document.getElementById('menu-category-filter').value;
+    const size = document.getElementById('menu-size-filter').value;
+    let filtered = allMenuItems;
+    if (cat) filtered = filtered.filter(i => i.category === cat);
+    if (size) filtered = filtered.filter(i => i.size === size);
+    renderMenu(filtered);
+  }
+  function clearMenuFilters() { document.getElementById('menu-category-filter').value=''; document.getElementById('menu-size-filter').value=''; renderMenu(allMenuItems); }
+  function renderMenu(items) {
+    const container = document.getElementById('menu-content');
+    document.getElementById('menu-result-count').textContent = 'Showing '+items.length+' item'+(items.length!==1?'s':'');
+    if (!items.length) { container.innerHTML='<div class="loading">No items match your filters.</div>'; return; }
+    const byCategory = {};
+    items.forEach(item => { if (!byCategory[item.category]) byCategory[item.category]=[]; byCategory[item.category].push(item); });
+    container.innerHTML = Object.keys(byCategory).sort().map(cat =>
+      '<div class="category-section"><div class="category-title">'+cat+'</div><div class="menu-grid">'+
+      byCategory[cat].map(item =>
+        '<div class="menu-card"><div class="menu-card-name">'+item.name+'</div><div class="menu-card-size">'+item.size+'</div><div class="menu-card-footer"><div class="menu-card-price">$'+parseFloat(item.price).toFixed(2)+'</div><div class="menu-card-cal">'+(item.calories>0?item.calories+' cal':'No calories')+'</div></div></div>'
+      ).join('')+'</div></div>'
+    ).join('');
+  }
+  let locationsLoaded = false;
+  async function loadLocations(state='', city='') {
+    locationsLoaded = true;
+    const container = document.getElementById('locations-content');
+    container.innerHTML = '<div class="loading">Loading locations...</div>';
+    let url = API_BASE+'/locations?limit=500';
+    if (state) url += '&state='+encodeURIComponent(state);
+    if (city) url += '&city='+encodeURIComponent(city);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      renderLocations(await res.json());
+    } catch(err) {
+      container.innerHTML = '<div class="error-msg">Failed to load locations.<br><small>'+err.message+'</small></div>';
+    }
+  }
+  function applyLocationFilters() { const s=document.getElementById('location-state-filter').value.trim(); const c=document.getElementById('location-city-filter').value.trim(); locationsLoaded=false; loadLocations(s,c); }
+  function clearLocationFilters() { document.getElementById('location-state-filter').value=''; document.getElementById('location-city-filter').value=''; locationsLoaded=false; loadLocations(); }
+  function formatHour(h) { if(h===null||h===undefined) return '—'; const hour=Math.floor(h/100); const min=h%100; const ampm=hour>=12?'PM':'AM'; const dh=hour>12?hour-12:(hour===0?12:hour); return dh+':'+(String(min).padStart(2,'0'))+' '+ampm; }
+  function getTodayHours(loc) { const days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday']; const day=days[new Date().getDay()]; const open=loc['hours_'+day+'_open']; const close=loc['hours_'+day+'_close']; if(open===null||open===undefined) return 'Hours unavailable'; return 'Today: '+formatHour(open)+' – '+formatHour(close); }
+  function renderLocations(locs) {
+    const container = document.getElementById('locations-content');
+    document.getElementById('locations-result-count').textContent = 'Showing '+locs.length+' location'+(locs.length!==1?'s':'');
+    const openCount = locs.filter(l=>l.open_for_business).length;
+    const statsBar = document.getElementById('locations-stats-bar');
+    statsBar.style.display='block';
+    statsBar.innerHTML = '<span>'+locs.length+'</span> locations found — <span>'+openCount+'</span> currently open for business';
+    if (!locs.length) { container.innerHTML='<div class="loading">No locations match your search.</div>'; return; }
+    container.innerHTML = '<div class="locations-grid">'+locs.map(loc =>
+      '<div class="location-card '+(loc.open_for_business?'':'closed')+'">'+
+      '<div class="location-header"><div class="location-city">'+loc.city+'</div>'+
+      '<div style="display:flex;gap:0.4rem;align-items:center;"><span class="location-state">'+loc.state+'</span>'+
+      '<span class="status-badge '+(loc.open_for_business?'open':'closed')+'">'+(loc.open_for_business?'Open':'Closed')+'</span></div></div>'+
+      '<div class="location-address">'+loc.address_one+(loc.address_two?', '+loc.address_two:'')+'<br>'+loc.city+', '+loc.state+' '+(loc.zip_code||'')+'</div>'+
+      (loc.phone_number?'<div class="location-phone">📞 '+loc.phone_number+'</div>':'')+
+      '<div class="location-hours">'+getTodayHours(loc)+'</div>'+
+      '<div class="amenities">'+(loc.wifi?'<span class="amenity-tag wifi">WiFi</span>':'')+(loc.drive_thru?'<span class="amenity-tag drive">Drive-Thru</span>':'')+(loc.door_dash?'<span class="amenity-tag doordash">DoorDash</span>':'')+'</div></div>'
+    ).join('')+'</div>';
+  }
+  showPage('home');
+</script>
+</body>
+</html>
