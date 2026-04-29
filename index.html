@@ -30,7 +30,7 @@
     .nav-btn:hover, .nav-btn.active { background: var(--gold); border-color: var(--gold); color: var(--white); }
     .nav-btn-login { background: var(--gold); border-color: var(--gold); color: var(--white); }
     .nav-btn-logout { background: transparent; border-color: #ff6b6b; color: #ff6b6b; }
-    .nav-btn-logout:hover { background: #ff6b6b; color: var(--white); }
+    .nav-btn-logout:hover { background: #ff6b6b; color: var(--white); border-color: #ff6b6b; }
     .hero { background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, var(--brown-warm) 100%); padding: 5rem 2rem; text-align: center; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(200,150,46,0.15) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(200,150,46,0.1) 0%, transparent 60%); }
     .hero-content { position: relative; z-index: 1; }
@@ -108,19 +108,34 @@
     .btn-full:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* DASHBOARD */
-    .dashboard-header { background: linear-gradient(135deg, var(--brown-dark), var(--brown-mid)); border-radius: 16px; padding: 2rem; color: var(--white); margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .dashboard-header { background: linear-gradient(135deg, var(--brown-dark), var(--brown-mid)); border-radius: 16px; padding: 2rem; color: var(--white); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
     .dashboard-welcome h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--white); }
     .dashboard-welcome p { color: var(--cream-dark); font-size: 0.9rem; margin-top: 0.3rem; }
     .points-badge { background: var(--gold); border-radius: 12px; padding: 1rem 1.5rem; text-align: center; min-width: 140px; }
     .points-badge .points-number { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; color: var(--white); line-height: 1; }
     .points-badge .points-label { font-size: 0.8rem; color: rgba(255,255,255,0.85); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* HOME STORE CARD */
+    .home-store-card { background: var(--white); border: 2px solid var(--gold); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+    .home-store-icon { font-size: 2rem; }
+    .home-store-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-weight: 600; margin-bottom: 0.2rem; }
+    .home-store-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--brown-dark); }
+
+    /* PROFILE CARD */
+    .profile-card { background: var(--white); border-radius: 12px; border: 1px solid var(--cream-dark); padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 2rem; flex-wrap: wrap; }
+    .profile-field { font-size: 0.85rem; }
+    .profile-field-label { color: var(--text-light); margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75rem; }
+    .profile-field-value { color: var(--text-dark); font-weight: 500; }
+
     .orders-section h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--brown-dark); margin-bottom: 1.2rem; }
     .order-card { background: var(--white); border-radius: 12px; border: 1px solid var(--cream-dark); margin-bottom: 1rem; overflow: hidden; box-shadow: 0 2px 8px rgba(44,26,14,0.06); }
     .order-card-header { padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; cursor: pointer; transition: background 0.2s; }
     .order-card-header:hover { background: var(--cream); }
     .order-date { font-weight: 600; color: var(--brown-dark); font-size: 0.95rem; }
     .order-store { font-size: 0.85rem; color: var(--text-light); margin-top: 0.2rem; }
+    .order-right { display: flex; align-items: center; gap: 1rem; }
     .order-total { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+    .order-points-earned { font-size: 0.78rem; background: #FFF8E1; color: #B8860B; padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; }
     .order-toggle { font-size: 0.8rem; color: var(--text-light); }
     .order-items-list { border-top: 1px solid var(--cream-dark); padding: 1rem 1.2rem; display: none; background: var(--cream); }
     .order-items-list.open { display: block; }
@@ -286,14 +301,17 @@
     const container = document.getElementById('dashboard-content');
     container.innerHTML = '<div class="loading">Loading your account...</div>';
     try {
-      const [pointsRes, ordersRes] = await Promise.all([
+      const [pointsRes, ordersRes, homeStoreRes] = await Promise.all([
         fetch(API_BASE + '/members/' + currentMember.id + '/points'),
-        fetch(API_BASE + '/members/' + currentMember.id + '/orders')
+        fetch(API_BASE + '/members/' + currentMember.id + '/orders'),
+        fetch(API_BASE + '/locations/' + currentMember.home_store)
       ]);
       const pointsData = await pointsRes.json();
       const ordersData = await ordersRes.json();
+      const homeStore = homeStoreRes.ok ? await homeStoreRes.json() : null;
       const points = pointsData.total_points || 0;
       const orders = ordersData || [];
+
       container.innerHTML = `
         <div class="dashboard-header">
           <div class="dashboard-welcome">
@@ -305,35 +323,68 @@
             <div class="points-label">Coffee Club Points</div>
           </div>
         </div>
+
+        ${homeStore ? `
+        <div class="home-store-card">
+          <div class="home-store-icon">☕</div>
+          <div>
+            <div class="home-store-label">Your Home Store</div>
+            <div class="home-store-name">${homeStore.city}, ${homeStore.state}</div>
+            <div style="font-size:0.85rem;color:var(--text-light);margin-top:0.2rem;">${homeStore.address_one} &mdash; ${homeStore.open_for_business ? '🟢 Open' : '🔴 Closed'}</div>
+          </div>
+        </div>` : ''}
+
+        <div class="profile-card">
+          <div class="profile-field">
+            <div class="profile-field-label">Full Name</div>
+            <div class="profile-field-value">${currentMember.first_name} ${currentMember.last_name}</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Email</div>
+            <div class="profile-field-value">${currentMember.email}</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Total Orders</div>
+            <div class="profile-field-value">${orders.length}</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Points Balance</div>
+            <div class="profile-field-value">${points} pts</div>
+          </div>
+        </div>
+
         <div class="orders-section">
           <h3>Order History</h3>
           ${orders.length === 0
             ? '<div class="no-orders">No orders found for your account.</div>'
-            : orders.map((order, idx) => `
-              <div class="order-card">
-                <div class="order-card-header" onclick="toggleOrder(${idx})">
-                  <div>
-                    <div class="order-date">${formatDate(order.order_date)}</div>
-                    <div class="order-store">📍 ${order.city || 'Unknown'}, ${order.state || ''}</div>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:1rem;">
-                    <div class="order-total">$${parseFloat(order.order_total).toFixed(2)}</div>
-                    <div class="order-toggle" id="toggle-${idx}">▼ Details</div>
-                  </div>
-                </div>
-                <div class="order-items-list" id="order-items-${idx}">
-                  ${(order.items || []).map(item => `
-                    <div class="order-item-row">
-                      <div>
-                        <div class="order-item-name">${item.item_name}</div>
-                        <div class="order-item-details">${item.size} &mdash; qty ${item.quantity}</div>
-                      </div>
-                      <div class="order-item-price">$${parseFloat(item.price).toFixed(2)}</div>
+            : orders.map((order, idx) => {
+                const pts = Math.floor(parseFloat(order.order_total));
+                return `
+                <div class="order-card">
+                  <div class="order-card-header" onclick="toggleOrder(${idx})">
+                    <div>
+                      <div class="order-date">${formatDate(order.order_date)}</div>
+                      <div class="order-store">📍 ${order.city || 'Unknown'}, ${order.state || ''}</div>
                     </div>
-                  `).join('')}
-                </div>
-              </div>
-            `).join('')}
+                    <div class="order-right">
+                      <span class="order-points-earned">+${pts} pts</span>
+                      <div class="order-total">$${parseFloat(order.order_total).toFixed(2)}</div>
+                      <div class="order-toggle" id="toggle-${idx}">▼ Details</div>
+                    </div>
+                  </div>
+                  <div class="order-items-list" id="order-items-${idx}">
+                    ${(order.items || []).map(item => `
+                      <div class="order-item-row">
+                        <div>
+                          <div class="order-item-name">${item.item_name}</div>
+                          <div class="order-item-details">${item.size} &mdash; qty ${item.quantity}</div>
+                        </div>
+                        <div class="order-item-price">$${parseFloat(item.price).toFixed(2)}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>`;
+              }).join('')}
         </div>`;
     } catch(err) {
       container.innerHTML = '<div class="error-msg">Failed to load dashboard: ' + err.message + '</div>';
